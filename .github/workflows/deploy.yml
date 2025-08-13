@@ -1,4 +1,3 @@
-
 name: Deploy to GitHub Pages
 
 on:
@@ -31,8 +30,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      # ✅ Inject the correct base for GitHub Pages
+      - name: Set Vite base path
+        run: echo "VITE_BASE=/$(basename $GITHUB_REPOSITORY)/" >> $GITHUB_ENV
+      
       - name: Build
-        run: npm run build
+        run: npm run build -- --base=$VITE_BASE
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
