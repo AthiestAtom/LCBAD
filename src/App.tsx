@@ -14,6 +14,8 @@ import Stories from "./pages/Stories";
 import StoryReader from "./pages/StoryReader";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
+import AssistantBot from "./components/AssistantBot";
+import AnonymousChat from "./components/AnonymousChat";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +79,8 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <AssistantBot />
+        <AnonymousChat />
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
