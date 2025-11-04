@@ -1,0 +1,55 @@
+[1mdiff --git a/src/components/Navbar.tsx b/src/components/Navbar.tsx[m
+[1mindex 34473ecd..888e9133 100644[m
+[1m--- a/src/components/Navbar.tsx[m
+[1m+++ b/src/components/Navbar.tsx[m
+[36m@@ -1,34 +1,15 @@[m
+ [m
+ import { Link, useLocation } from "react-router-dom";[m
+[31m-import { Book, Users, User, LogOut, clock } from "lucide-react";[m
+[32m+[m[32mimport { Book, Users, User, LogOut } from "lucide-react";[m
+ import { useAuth } from "@/hooks/useAuth";[m
+ import { Button } from "@/components/ui/button";[m
+ import { useToast } from "@/hooks/use-toast";[m
+[31m-import { useState, useEffect } from "react";[m
+[32m+[m[32mimport LiveClock from "./LiveClock";[m
+ [m
+ const Navbar: React.FC = () => {[m
+   const location = useLocation();[m
+   const { user, signOut } = useAuth();[m
+   const { toast } = useToast();[m
+[31m-  const [currentTime, setCurrentTime] = useState(new Date());[m
+[31m-[m
+[31m-  //use time every second[m
+[31m-  useEffect(() => {[m
+[31m-    const timer = setInterval(() => {[m
+[31m-      setCurrentTime(new Date());[m
+[31m-    }, 1000);[m
+[31m-[m
+[31m-    return () => clearInterval(timer);[m
+[31m-  }, []);[m
+[31m-[m
+[31m-  const formatTime = (date: Date) => {[m
+[31m-    return date.toLocateTimeString('en-US', {[m
+[31m-      hour: '2-digit',[m
+[31m-      minute: '2-digit',[m
+[31m-      second: '2-digit',[m
+[31m-      hour12:false[m
+[31m-      });[m
+[31m-    };[m
+ [m
+   const isActive = (path: string) => {[m
+     return location.pathname === path ? "text-comic-purple" : "hover:text-comic-purple transition-colors";[m
+[36m@@ -64,11 +45,8 @@[m [mconst Navbar: React.FC = () => {[m
+         </div>[m
+         [m
+         <div className="flex items-center space-x-6">[m
+[31m-        {/*clock display*/}[m
+[31m-        <div classname="flex items-center space-x-2 text-sm text-gray-300 bg-white/5 px-3 py-1 rounded-md">[m
+[31m-        <Clock className="h-4 w-4 text-comic-softBliue" />[m
+[31m-        <span className="font-mono">{formatTime(currentTime)}</span>[m
+[31m-        </div>[m
+[32m+[m[32m        {/* Live Clock Display */}[m
+[32m+[m[32m        <LiveClock showSeconds={true} variant="default" />[m
+         [m
+           <div className="flex space-x-6">[m
+             <Link [m
