@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,100 +16,89 @@ import {
   UserPlus,
   Settings,
   Sparkles,
-  Search
+  Search,`r`n  Check,`r`n  CheckCheck
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-
-interface ChatMessage {
-  id: string;
-  content: string;
-  sender: string;
-  timestamp: Date;
-  isEphemeral: boolean;
-  isBurned: boolean;
-  receiver?: string;
-  expiresAt?: Date;
-}
-
-interface AnonymousUser {
-  address: string;
-  pseudonym: string;
-  reputation: number;
-  isOnline: boolean;
-}
+import Footer from '@/components/Footer';`r`nimport { useAnonymousChat, ChatMessage, AnonymousUser } from '@/hooks/useAnonymousChat';
 
 const AnonymousChat = () => {
-  const [isConnected, setIsConnected] = useState(false);
-  const [anonymousIdentity, setAnonymousIdentity] = useState<{ address: string; pseudonym: string; reputation: number } | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<AnonymousUser[]>([
-    { address: 'user1', pseudonym: 'ShadowTraveler#1234', reputation: 85, isOnline: true },
-    { address: 'user2', pseudonym: 'MysterySeeker#5678', reputation: 92, isOnline: true },
-    { address: 'user3', pseudonym: 'PhantomVoyager#9012', reputation: 78, isOnline: true }
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    isConnected,
+    anonymousIdentity,
+    messages,
+    onlineUsers,
+    typingUsers,
+    isLoading,
+    error,
+    initializeAnonymousChat,
+    sendMessage,
+    burnMessage,
+    updatePseudonym,
+    discoverOnlineUsers,
+    disconnect,
+    markAsRead,
+    sendTypingIndicator,
+    loadMessageHistory
+  } = useAnonymousChat();
+
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState('');
   const [newPseudonym, setNewPseudonym] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [userSearch, setUserSearch] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Load message history when user is selected
+  useEffect(() => {
+    if (selectedUser && anonymousIdentity) {
+      loadMessageHistory(selectedUser).then(() => {
+        // Messages will be added via real-time subscriptions
+      });
+      // Mark messages as read when opening conversation
+      markAsRead(selectedUser);
+    }
+  }, [selectedUser, anonymousIdentity, loadMessageHistory, markAsRead]);
 
-  // Demo functions
-  const initializeAnonymousChat = async () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      const identity = {
-        address: 'demo_' + Math.random().toString(36).substr(2, 9),
-        pseudonym: 'AnonymousUser' + Math.floor(Math.random() * 1000),
-        reputation: Math.floor(Math.random() * 100)
-      };
-      setAnonymousIdentity(identity);
-      setIsConnected(true);
-      setIsLoading(false);
-    }, 1000);
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: ''smooth'' });
+  }, [messages]);
+
+  // Handle typing indicators
+  const handleInputChange = (value: string) => {
+    setMessageInput(value);
+    if (selectedUser) {
+      if (value.trim().length > 0) {
+        sendTypingIndicator(selectedUser, true);
+        // Clear existing timeout
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+        // Set timeout to stop typing indicator
+        typingTimeoutRef.current = setTimeout(() => {
+          sendTypingIndicator(selectedUser, false);
+        }, 2000);
+      } else {
+        sendTypingIndicator(selectedUser, false);
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = null;
+        }
+      }
+    }
   };
 
-  const sendMessage = async (receiverAddress: string, content: string) => {
-    if (!anonymousIdentity) return;
-    
-    const message: ChatMessage = {
-      id: Date.now().toString(),
-      content,
-      sender: anonymousIdentity.address,
-      timestamp: new Date(),
-      isEphemeral: false,
-      isBurned: false,
-      receiver: receiverAddress
-    };
-    setMessages(prev => [...prev, message]);
-  };
 
-  const burnMessage = (messageId: string) => {
-    setMessages(prev => prev.map(msg => 
-      msg.id === messageId ? { ...msg, isBurned: true } : msg
-    ));
-  };
 
-  const updatePseudonym = async (newPseudonym: string) => {
-    if (!anonymousIdentity) return;
-    setAnonymousIdentity(prev => prev ? { ...prev, pseudonym: newPseudonym } : null);
-  };
 
-  const discoverOnlineUsers = async () => {
-    // Demo function - just refresh the list
-    setOnlineUsers(prev => [...prev]);
-  };
 
-  const disconnect = () => {
-    setIsConnected(false);
-    setAnonymousIdentity(null);
-    setMessages([]);
-    setOnlineUsers([]);
-    setError(null);
-  };
+
+
+
+
+
+
+
 
   const handleSendMessage = async () => {
     if (!messageInput.trim() || !selectedUser) return;
@@ -117,7 +106,14 @@ const AnonymousChat = () => {
     try {
       await sendMessage(selectedUser, messageInput.trim());
       setMessageInput('');
-      setIsTyping(false);
+      // Stop typing indicator
+      if (selectedUser) {
+        sendTypingIndicator(selectedUser, false);
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = null;
+        }
+      }
     } catch (err) {
       console.error('Failed to send message:', err);
     }
@@ -142,9 +138,9 @@ const AnonymousChat = () => {
   const currentThread = useMemo(() => {
     if (!selectedUser || !anonymousIdentity) return [] as ChatMessage[];
     return messages.filter(msg =>
-      (msg.sender === selectedUser && msg.receiver === anonymousIdentity.address) ||
-      (msg.sender === anonymousIdentity.address && msg.receiver === selectedUser)
-    );
+      (msg.sender === selectedUser && msg.receiver === anonymousIdentity.publicKey) ||
+      (msg.sender === anonymousIdentity.publicKey && msg.receiver === selectedUser)
+    ).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   }, [messages, selectedUser, anonymousIdentity]);
 
   const handleUpdatePseudonym = async () => {
@@ -184,7 +180,14 @@ const AnonymousChat = () => {
         <polyline points="12 6 12 12 16 14" />
       </svg>
     );
-    return <Eye className="h-3 w-3 text-green-500" />;
+    // Show read receipts (Telegram-like)
+    if (message.isRead) {
+      return <CheckCheck className="h-3 w-3 text-blue-500" />;
+    }
+    if (message.isDelivered) {
+      return <Check className="h-3 w-3 text-gray-400" />;
+    }
+    return <Eye className="h-3 w-3 text-gray-500" />;
   };
 
   return (
@@ -203,7 +206,7 @@ const AnonymousChat = () => {
               <Sparkles className="h-6 w-6 text-pink-300" />
             </h1>
             <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto">
-              Secure, private conversations — ephemeral by choice, memorable by design.
+              Secure, private conversations â€” ephemeral by choice, memorable by design.
             </p>
           </div>
 
@@ -393,19 +396,19 @@ const AnonymousChat = () => {
                         {currentThread.map((message) => (
                           <div
                             key={message.id}
-                            className={`flex ${message.sender === anonymousIdentity.address ? 'justify-end' : 'justify-start'}`}
+                            className={`flex ${message.sender === anonymousIdentity.publicKey ? 'justify-end' : 'justify-start'}`}
                           >
                             <div
                               className={`max-w-[80%] p-3 rounded-2xl shadow-sm border ${
-                                message.sender === anonymousIdentity.address
+                                message.sender === anonymousIdentity.publicKey
                                   ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white border-purple-400/40'
                                   : 'bg-white text-gray-800 border-gray-200'
                               }`}
                             >
                               <div className="flex items-center gap-2 mb-1">
                                 {getMessageStatusIcon(message)}
-                                <span className={`text-xs ${message.sender === anonymousIdentity.address ? 'opacity-80' : 'text-gray-500'}`}>
-                                  {message.sender === anonymousIdentity.address
+                                <span className={`text-xs ${message.sender === anonymousIdentity.publicKey ? 'opacity-80' : 'text-gray-500'}`}>
+                                  {message.sender === anonymousIdentity.publicKey
                                     ? anonymousIdentity.pseudonym
                                     : onlineUsers.find(u => u.address === message.sender)?.pseudonym || 'Unknown'}
                                 </span>
@@ -426,7 +429,7 @@ const AnonymousChat = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => burnMessage(message.id)}
-                                  className={`text-xs p-1 h-auto mt-1 ${message.sender === anonymousIdentity.address ? 'text-white/80 hover:text-white' : 'text-gray-600 hover:text-gray-800'}`}
+                                  className={`text-xs p-1 h-auto mt-1 ${message.sender === anonymousIdentity.publicKey ? 'text-white/80 hover:text-white' : 'text-gray-600 hover:text-gray-800'}`}
                                 >
                                   <Flame className="h-3 w-3 mr-1" />
                                   Burn
@@ -441,7 +444,7 @@ const AnonymousChat = () => {
                             <p className="text-sm">No messages yet. Say hello and start the conversation!</p>
                           </div>
                         )}
-                        {isTyping && (
+                        {selectedUser && typingUsers.has(selectedUser) && (
                           <div className="flex justify-start">
                             <div className="max-w-[60%] p-3 rounded-2xl bg-white text-gray-800 border border-gray-200">
                               <div className="flex items-center gap-2">
@@ -464,7 +467,7 @@ const AnonymousChat = () => {
                         <div className="flex gap-2 items-end">
                           <Input
                             value={messageInput}
-                            onChange={(e) => { setMessageInput(e.target.value); setIsTyping(e.target.value.trim().length > 0); }}
+                            onChange={(e) => handleInputChange(e.target.value)}
                             onKeyPress={handleKeyPress}
                             placeholder="Type your message..."
                             className="flex-1 bg-white/10 border-purple-400/60 text-white placeholder:text-gray-400 rounded-xl"
@@ -536,3 +539,8 @@ const AnonymousChat = () => {
 };
 
 export default AnonymousChat;
+
+
+
+
+

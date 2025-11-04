@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -89,12 +89,140 @@ export type Database = {
         };
         Relationships: [];
       };
+      anonymous_messages: {
+        Row: {
+          id: string;
+          sender_public_key: string;
+          receiver_public_key: string;
+          content: string;
+          encrypted_content: string | null;
+          message_type: string;
+          ipfs_hash: string | null;
+          sequence_number: number;
+          created_at: string;
+          updated_at: string;
+          is_ephemeral: boolean;
+          expires_at: string | null;
+          is_burned: boolean;
+          burned_at: string | null;
+          is_delivered: boolean;
+          delivered_at: string | null;
+          is_read: boolean;
+          read_at: string | null;
+          edited_at: string | null;
+          reply_to_message_id: string | null;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          sender_public_key: string;
+          receiver_public_key: string;
+          content: string;
+          encrypted_content?: string | null;
+          message_type?: string;
+          ipfs_hash?: string | null;
+          sequence_number?: number;
+          created_at?: string;
+          updated_at?: string;
+          is_ephemeral?: boolean;
+          expires_at?: string | null;
+          is_burned?: boolean;
+          burned_at?: string | null;
+          is_delivered?: boolean;
+          delivered_at?: string | null;
+          is_read?: boolean;
+          read_at?: string | null;
+          edited_at?: string | null;
+          reply_to_message_id?: string | null;
+          metadata?: Json;
+        };
+        Update: {
+          id?: string;
+          sender_public_key?: string;
+          receiver_public_key?: string;
+          content?: string;
+          encrypted_content?: string | null;
+          message_type?: string;
+          ipfs_hash?: string | null;
+          sequence_number?: number;
+          created_at?: string;
+          updated_at?: string;
+          is_ephemeral?: boolean;
+          expires_at?: string | null;
+          is_burned?: boolean;
+          burned_at?: string | null;
+          is_delivered?: boolean;
+          delivered_at?: string | null;
+          is_read?: boolean;
+          read_at?: string | null;
+          edited_at?: string | null;
+          reply_to_message_id?: string | null;
+          metadata?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "anonymous_messages_reply_to_message_id_fkey";
+            columns: ["reply_to_message_id"];
+            isOneToOne: false;
+            referencedRelation: "anonymous_messages";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      anonymous_typing_indicators: {
+        Row: {
+          id: string;
+          sender_public_key: string;
+          receiver_public_key: string;
+          is_typing: boolean;
+          started_at: string;
+          expires_at: string;
+        };
+        Insert: {
+          id?: string;
+          sender_public_key: string;
+          receiver_public_key: string;
+          is_typing?: boolean;
+          started_at?: string;
+          expires_at?: string;
+        };
+        Update: {
+          id?: string;
+          sender_public_key?: string;
+          receiver_public_key?: string;
+          is_typing?: boolean;
+          started_at?: string;
+          expires_at?: string;
+        };
+        Relationships: [];
+      };
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_unread_count: {
+        Args: {
+          receiver_key: string;
+        };
+        Returns: number;
+      };
+      mark_messages_as_read: {
+        Args: {
+          receiver_key: string;
+          sender_key: string;
+          read_before?: string;
+        };
+        Returns: number;
+      };
+      cleanup_expired_typing_indicators: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      cleanup_expired_messages: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
     }
     Enums: {
       [_ in never]: never
@@ -227,3 +355,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

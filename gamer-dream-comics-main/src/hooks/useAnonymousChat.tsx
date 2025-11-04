@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { anonymousChatClient, AnonymousIdentity, AnonymousMessage } from '@/integrations/web3/client';
 import { supabase } from '@/integrations/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
@@ -47,6 +47,7 @@ export const useAnonymousChat = () => {
   const cleanupRef = useRef<NodeJS.Timeout | null>(null);
   const presenceRef = useRef<NodeJS.Timeout | null>(null);
   const typingTimeoutRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const channelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
   const messagesChannelRef = useRef<RealtimeChannel | null>(null);
   const typingChannelRef = useRef<RealtimeChannel | null>(null);
   const onlineUsersChannelRef = useRef<RealtimeChannel | null>(null);
@@ -148,7 +149,7 @@ export const useAnonymousChat = () => {
     })).reverse(); // Reverse to show oldest first
   }, [anonymousIdentity]);
 
-  // Mark message as delivered (Telegram-like)
+  // Mark message as delivered (Telegram-like) - defined before use
   const markAsDelivered = useCallback(async (messageId: string) => {
     await supabase
       .from('anonymous_messages')
