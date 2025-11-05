@@ -212,7 +212,7 @@ const AssistantBot: React.FC<AssistantBotProps> = ({ className }) => {
     storyArcs: [
       {
         name: "Videogamer Arc",
-        stories: ["videogamer-1", "videogamer-2", "videogamer-3"],
+        stories: ["videogamer-1", "videogamer-2", "videogamer-3", "videogamer-4"],
         theme: "Gaming powers and reality manipulation",
         mainCharacter: "The Kid"
       },

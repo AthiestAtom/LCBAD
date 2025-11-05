@@ -113,6 +113,22 @@ export const characters: Character[] = [
     relatedStory: "videogamer-3"
   },
   {
+    id: "gambler",
+    name: "The Gambler (Another-Videogamer)",
+    role: "Antagonist",
+    description: "The mysterious mastermind behind the Zapee gambling app who possesses gaming powers similar to the VideoGamer. Working with the company that created defunct slot games, he uses his abilities to scam players through gambling apps. He believes that all gamers cheat through reloading, resaving, and emulator tricks, and uses these mechanics to trap people in save files while continuing his schemes. His philosophy blurs the line between gaming and gambling, using game mechanics to exploit real people rather than just NPCs.",
+    abilities: [
+      "Gaming reality manipulation (similar to VideoGamer)",
+      "Emulator-based reload/resave mechanics",
+      "Save file trapping and manipulation",
+      "Digital footprint masking and cyber manipulation",
+      "App development and deployment",
+      "Gambling scheme orchestration",
+      "Reality manipulation through gaming mechanics"
+    ],
+    relatedStory: "videogamer-4"
+  },
+  {
     id: "atom",
     name: "Atom (The Pyscho)",
     role: "Protagonist",

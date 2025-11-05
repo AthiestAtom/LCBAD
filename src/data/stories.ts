@@ -61,6 +61,111 @@ The bully girl heard about death of Videogamer who sacrificed himself for her ne
     featured: false
   },
   {
+    id: "videogamer-4",
+    title: "The VideoGamer 4",
+    author: "Jashan Bansal",
+    summary: "Between gambling and gaming lies a thin line — cheating people or NPCs.",
+    content: `After the events of VideoGamer 3, the Kid left the hostel with a backpack and a conscience too strict to let him bend. He struggled to find a place to live, eventually managing to join one of those emergency flatmate listings — a place where dust lived longer than tenants.
+
+Aaryansh had a few missed calls from him but didn't think much of it, buried deep in a project of his own. Meanwhile, on the other side of the city, the Kid had gone from an idle gamer to the friendly neighbourhood VideoGamer — cleaning up digital chaos by bringing the games to life.
+
+One day, while he was fleeing out bad guys as Homelander from Mortal Kombat 1, floating mid-air in his pixelated avatar, people below suddenly began egging him and yelling "Scammer!" Confused, he escaped to the skyline and pulled up his drone to investigate.
+
+The drone showed something disturbing — local players who used to gamble on slot and betting apps were furious. The government had banned such games, but a new viral app, Zapee*, had emerged from nowhere. It was rumored to have tunneled through judicial firewalls, letting people gamble again. But the moment users started earning, the app wiped their accounts clean and demanded strange "cashback dares" — like smashing vases, slapping friends, or breaking things nearby.
+
+Soon, the mob believed The VideoGamer was behind it all — their irritation given a face. Even old gamblers joined the protests. Framed and furious, the Kid sent an encrypted alert to Aaryansh, then followed the drone's lead toward the source.
+
+The drone traced a digital footprint back to the same company that had once hired developers for every slot game that now lay defunct — the very ones who made Zapee.
+
+As soon as the red alert pinged, Aaryansh called.
+
+"Kid, listen, I have an idea that might save you."
+
+But the Kid, tired and wired from the chase, cut in.
+
+"Later. First, we find what's causing this."
+
+Before they could, Aaryansh's screen glitched. His account was hacked — cyber-pruned by Zapee's own code. The phone rang. The dialer ID read: Another-Videogamer.
+
+The voice on the other end was eerie.
+
+"You think you're the only one? We all cheat, that's what gamers do. Reloading. Resaving. Emulator tricks. Even your resets make you one of us."
+
+The Kid froze. The caller laughed.
+
+"Try reloading now, and one of us will keep scamming your world while the rest trap you inside your own save file."
+
+The line went dead, leaving static and goosebumps.
+
+Aaryansh insisted again, "Just… hear my idea once."
+
+The Kid sighed, frustrated but cornered.
+
+"Fine. Do whatever you have to."
+
+Aaryansh explained he'd need to copy the Kid's source code using his latest invention. The Kid hesitated — but agreed. In the meantime, the drone located Zapee's physical hideout. Aaryansh and the drone stayed outside, waiting while the Kid stepped in for battle.
+
+________________________________________
+
+Round 1 — Among Us
+
+Fifteen players. Three imposters. One engineer — the Kid.
+
+He stayed silent, blending in, wiring tasks and sabotaging backdoors. But soon the crowd turned paranoid. Random votes began. After four chaotic trials, the randomness caught him — the Kid was ejected into space.
+
+From 15, only 11 remained, including him counted in the drop before the next round.
+
+________________________________________
+
+Round 2 — Free Fire
+
+He respawned in a collapsing arena. Seven quick kills, each faster than the last. His reflexes were godlike, but the odds weren't. A sniper from nowhere ended his streak.
+
+From 11, the number dropped again — now only four stood.
+
+________________________________________
+
+Round 3 — Ludo
+
+Four seats. Three against one. Perfect.
+
+The Kid smirked this time. He'd honed 3v1 Ludo in twelfth grade until the patterns were muscle memory. Dice rolled like drums. Within minutes, three pawns reached home.
+
+The Zapee head — smug behind a player tag — spat,
+
+"It's emulated. I'll reload and resave until you lose."
+
+Outside, Aaryansh's plan—quiet, ugly, precise—kicked in. The Emulation Jammer he'd placed at the perimeter pushed an update that nuked free reloads. The emulator now charged for every reload/resave; the cheat economy went behind a paywall.
+
+The smugness cracked. The Kid was winning this time.
+
+The final pawn moved. Victory.
+
+________________________________________
+
+In front of the company's core server, The VideoGamer stood firm.
+
+He proved that while he had used reload/resave before, it was never to cheat the real game — only to outsmart broken NPC systems.
+
+He looked the Zapee devs dead in the eye and said,
+
+"You're not VideoGamers. You're video gamblers."
+
+Within moments, devices across the city lit up with notifications — money restored, followed by a short note:
+
+"Playing and betting are never the same."
+
+Aaryansh returned to his lab, jammer in hand, already drafting something even stranger.
+
+And the Kid — the real VideoGamer — finally moved out of the filthy flat and into a quiet PG.
+
+A fresh level unlocked.
+
+But the next mission… already loading.`,
+    published: "November 4, 2025",
+    featured: false
+  },
+  {
     id: "atom-1",
     title: "The White Room 1",
     author: "Jashan Bansal",

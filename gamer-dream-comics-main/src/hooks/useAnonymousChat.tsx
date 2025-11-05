@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { anonymousChatClient, AnonymousIdentity, AnonymousMessage } from '@/integrations/web3/client';
+import { anonymousChatClient, AnonymousIdentity } from '@/integrations/web3/client';
 import { supabase } from '@/integrations/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { getMTProtoClient, MTProtoClient } from '@/integrations/web3/mtproto-client';
@@ -56,12 +56,19 @@ export const useAnonymousChat = () => {
 
   // Announce presence to Supabase (Telegram-like)
   const announcePresence = useCallback(async (identity: AnonymousIdentity) => {
-    await supabase.from('anonymous_online_users').upsert({
+    const { error } = await supabase.from('anonymous_online_users').upsert({
       public_key: identity.publicKey,
       pseudonym: identity.pseudonym,
       last_seen: new Date().toISOString(),
       is_online: true,
-    }, { onConflict: 'public_key' });
+    }, { 
+      onConflict: 'public_key',
+      ignoreDuplicates: false 
+    });
+    
+    if (error) {
+      console.error('Error announcing presence:', error);
+    }
   }, []);
 
   // Remove presence from Supabase
@@ -74,6 +81,8 @@ export const useAnonymousChat = () => {
 
   // Fetch online users from Supabase
   const fetchOnlineUsers = useCallback(async () => {
+    if (!anonymousIdentity) return; // Don't fetch if not initialized
+    
     const since = new Date(Date.now() - ONLINE_TIMEOUT).toISOString();
     const { data, error } = await supabase
       .from('anonymous_online_users')
@@ -87,25 +96,52 @@ export const useAnonymousChat = () => {
       return;
     }
 
-    // Get unread counts for each user (Telegram-like)
+    if (!data || data.length === 0) {
+      setOnlineUsers([]);
+      return;
+    }
+
+    // Get unread counts for each user (messages FROM that user TO current user)
     const usersWithUnread = await Promise.all(
-      (data || []).map(async (u) => {
-        if (!anonymousIdentity) return null;
-        const { data: unreadData } = await supabase.rpc('get_unread_count', {
-          receiver_key: anonymousIdentity.publicKey,
-        });
-        return {
-          address: u.public_key,
-          pseudonym: u.pseudonym,
-          reputation: Math.floor(Math.random() * 100), // Placeholder
-          isOnline: u.is_online,
-          lastSeen: new Date(u.last_seen),
-          unreadCount: unreadData || 0,
-        };
+              data.map(async (u) => {
+          try {
+            // Query directly to get count for messages from this specific user
+            const { count } = await supabase
+            .from('anonymous_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('sender_public_key', u.public_key)
+            .eq('receiver_public_key', anonymousIdentity.publicKey)
+            .eq('is_read', false)
+            .eq('is_burned', false)
+            .or('expires_at.is.null,expires_at.gt.' + new Date().toISOString());
+          
+          return {
+            address: u.public_key,
+            pseudonym: u.pseudonym,
+            reputation: Math.floor(Math.random() * 100), // Placeholder
+            isOnline: u.is_online,
+            lastSeen: new Date(u.last_seen),
+            unreadCount: count || 0,
+          };
+        } catch (err) {
+          console.error('Error getting unread count for user:', u.public_key, err);
+          return {
+            address: u.public_key,
+            pseudonym: u.pseudonym,
+            reputation: Math.floor(Math.random() * 100),
+            isOnline: u.is_online,
+            lastSeen: new Date(u.last_seen),
+            unreadCount: 0,
+          };
+        }
       })
     );
 
-    setOnlineUsers(usersWithUnread.filter(u => u !== null) as AnonymousUser[]);
+    // Filter out the current user and any nulls, then set online users
+    const otherUsers = usersWithUnread
+      .filter(u => u !== null && u.address !== anonymousIdentity.publicKey) as AnonymousUser[];
+    
+    setOnlineUsers(otherUsers);
   }, [anonymousIdentity]);
 
   // Load message history (Telegram-like pagination)
@@ -373,6 +409,15 @@ export const useAnonymousChat = () => {
     }
   }, [anonymousIdentity]);
 
+  // Start presence interval
+  const startPresenceInterval = useCallback((identity: AnonymousIdentity) => {
+    if (presenceRef.current) clearInterval(presenceRef.current);
+    presenceRef.current = setInterval(async () => {
+      await announcePresence(identity);
+      fetchOnlineUsers();
+    }, ONLINE_PRESENCE_INTERVAL);
+  }, [announcePresence, fetchOnlineUsers]);
+
   // Initialize anonymous chat
   const initializeAnonymousChat = useCallback(async () => {
     setIsLoading(true);
@@ -402,7 +447,7 @@ export const useAnonymousChat = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [announcePresence, fetchOnlineUsers, setupRealtimeSubscriptions, processMTProtoBatches]);
+  }, [announcePresence, fetchOnlineUsers, setupRealtimeSubscriptions, processMTProtoBatches, startPresenceInterval]);
 
   // Send anonymous message (MTProto-optimized with batching)
   const sendMessage = useCallback(async (
@@ -477,15 +522,6 @@ export const useAnonymousChat = () => {
       throw err;
     }
   }, [isConnected, anonymousIdentity]);
-
-  // Start presence interval
-  const startPresenceInterval = useCallback((identity: AnonymousIdentity) => {
-    if (presenceRef.current) clearInterval(presenceRef.current);
-    presenceRef.current = setInterval(async () => {
-      await announcePresence(identity);
-      fetchOnlineUsers();
-    }, ONLINE_PRESENCE_INTERVAL);
-  }, [announcePresence, fetchOnlineUsers]);
 
   // Burn a message
   const burnMessage = useCallback(async (messageId: string) => {
