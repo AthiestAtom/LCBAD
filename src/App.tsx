@@ -28,7 +28,7 @@ const App = () => {
 
     const startMusic = () => {
       if (!started) {
-        const audio = new Audio("/videoplayback.weba");
+        const audio = new Audio("/videoplayback.mp3");
         audio.loop = true;
         audio.volume = 1.0; // adjust if needed
         audio.play().catch(() => {});
