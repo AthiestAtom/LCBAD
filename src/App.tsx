@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AssistantWidget from "./components/AssistantWidget";
+
 import Assistant from "./pages/Assistant";
 import AnonymousChat from "./pages/AnonymousChat";
 import Index from "./pages/Index";
@@ -18,78 +20,107 @@ import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <HashRouter>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/characters" 
-              element={
-                <ProtectedRoute>
-                  <Characters />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/stories" 
-              element={
-                <ProtectedRoute>
-                  <Stories />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/read/:storyId" 
-              element={
-                <ProtectedRoute>
-                  <StoryReader />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/about" 
-              element={
-                <ProtectedRoute>
-                  <About />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/assistant" 
-              element={
-                <ProtectedRoute>
-                  <Assistant />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/anonymous-chat" 
-              element={
-                <ProtectedRoute>
-                  <AnonymousChat />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <AssistantWidget />
-        </HashRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+
+  // ⭐ BACKGROUND MUSIC EFFECT ⭐
+  useEffect(() => {
+    let started = false;
+
+    const startMusic = () => {
+      if (!started) {
+        const audio = new Audio("/videoplayback.weba");
+        audio.loop = true;
+        audio.volume = 1.0; // adjust if needed
+        audio.play().catch(() => {});
+        started = true;
+      }
+    };
+
+    // Start on **any scroll or wheel movement**
+    window.addEventListener("scroll", startMusic, { once: true });
+    window.addEventListener("wheel", startMusic, { once: true });
+    window.addEventListener("touchmove", startMusic, { once: true });
+
+    return () => {
+      window.removeEventListener("scroll", startMusic);
+      window.removeEventListener("wheel", startMusic);
+      window.removeEventListener("touchmove", startMusic);
+    };
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <HashRouter>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/characters"
+                element={
+                  <ProtectedRoute>
+                    <Characters />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/stories"
+                element={
+                  <ProtectedRoute>
+                    <Stories />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/read/:storyId"
+                element={
+                  <ProtectedRoute>
+                    <StoryReader />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <ProtectedRoute>
+                    <About />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/assistant"
+                element={
+                  <ProtectedRoute>
+                    <Assistant />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/anonymous-chat"
+                element={
+                  <ProtectedRoute>
+                    <AnonymousChat />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <AssistantWidget />
+          </HashRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
